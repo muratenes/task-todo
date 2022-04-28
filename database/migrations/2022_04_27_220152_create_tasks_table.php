@@ -17,7 +17,6 @@ class CreateTasksTable extends Migration
             $table->id();
             $table->unsignedTinyInteger('difficulty')->comment("zorluk kat sayısı");
             $table->unsignedTinyInteger('hour')->comment("saat");
-            // todo  :sil
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('remote_id');
             $table->string('provider')->nullable();

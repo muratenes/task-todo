@@ -34,8 +34,8 @@ class ToDoService
         $totalTaskHour = (int)Task::whereNull('user_id')->sum('hour');
         $jobTotalWeekCount = ceil($totalTaskHour / $this->getWorkHourPerWeek());
         for ($i = 1; $i <= $jobTotalWeekCount; $i++) {
-            $tasks = Task::whereNull('user_id')->orderByDesc('difficulty')->get();
             foreach ($users as $user) {
+                $tasks = Task::whereNull('user_id')->orderByDesc('difficulty')->get();
                 $userWorkHourByWeek = Work::where(['user_id' => $user->id, 'week_number' => $i])->sum('hour');
                 foreach ($tasks as $task) {
                     if ($userWorkHourByWeek + $task->hour <= 45) {

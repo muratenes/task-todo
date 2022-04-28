@@ -18,7 +18,7 @@ class CreateWorksTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('task_id');
             $table->unsignedTinyInteger('week_number');
-            // TODO : SİL
+            // TODO : DELETE column
             $table->unsignedTinyInteger('hour');
             $table->timestamps();
         });
