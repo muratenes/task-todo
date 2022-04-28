@@ -31,7 +31,7 @@ class UpdateTasksCommand extends Command
     {
         (new ToDoService())->updateTasks([
             new \App\Library\Services\TodoService\Providers\FirstProvider(),
-            new \App\Library\Services\TodoService\Providers\SecondProvider(),
+//            new \App\Library\Services\TodoService\Providers\SecondProvider(),
         ]);
         $this->warn("All task updated");
 

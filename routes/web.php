@@ -13,6 +13,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+//Route::get('/', function () {
+//
+//    $service = new \App\Library\Services\TodoService\ToDoService();
+//    $service->updateTasks([
+//        new \App\Library\Services\TodoService\Providers\FirstProvider(),
+//        new \App\Library\Services\TodoService\Providers\SecondProvider(),
+//    ]);
+//
+//    return view('welcome');
+//});
+
+Route::get('/', [\App\Http\Controllers\HomeController::class, 'index']);
+Route::get('/works', [\App\Http\Controllers\HomeController::class, 'works']);
