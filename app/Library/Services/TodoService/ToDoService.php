@@ -38,7 +38,7 @@ class ToDoService
                 $tasks = Task::whereNull('user_id')->orderByDesc('difficulty')->get();
                 $userWorkHourByWeek = Work::where(['user_id' => $user->id, 'week_number' => $i])->sum('hour');
                 foreach ($tasks as $task) {
-                    if ($userWorkHourByWeek + $task->hour <= 45) {
+                    if ($userWorkHourByWeek + $task->hour <= TodoEnum::WORKER_WEEKLY_HOUR_COUNT) {
                         Work::create(['user_id' => $user->id, 'task_id' => $task->id, 'week_number' => $i, 'hour' => $task->hour]);
                         $task->update(['user_id' => $user->id]);
                         $userWorkHourByWeek += $task->hour;
