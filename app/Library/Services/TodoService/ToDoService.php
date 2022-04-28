@@ -34,25 +34,27 @@ class ToDoService
         $totalTaskHour = (int)Task::whereNull('user_id')->sum('hour');
         $jobTotalWeekCount = ceil($totalTaskHour / $this->getWorkHourPerWeek());
         for ($i = 1; $i <= $jobTotalWeekCount; $i++) {
-            foreach ($users as $user) {
-                $tasks = Task::whereNull('user_id')->orderByDesc('difficulty')->get();
-                $userWorkHourByWeek = Work::where(['user_id' => $user->id, 'week_number' => $i])->sum('hour');
-                foreach ($tasks as $task) {
-                    if ($userWorkHourByWeek + $task->hour <= TodoEnum::WORKER_WEEKLY_HOUR_COUNT) {
-                        Work::create(['user_id' => $user->id, 'task_id' => $task->id, 'week_number' => $i, 'hour' => $task->hour]);
-                        $task->update(['user_id' => $user->id]);
-                        $userWorkHourByWeek += $task->hour;
-                    } else {
-                        $lastTask = Task::whereNull('user_id')->where('hour', '<=', TodoEnum::WORKER_WEEKLY_HOUR_COUNT - $userWorkHourByWeek)->first();
-                        if ($lastTask) {
-                            Work::create(['user_id' => $user->id, 'task_id' => $lastTask->id, 'week_number' => $i, 'hour' => $lastTask->hour]);
-                            $lastTask->update(['user_id' => $user->id]);
+            $tasks = Task::whereNull('user_id')->orderByDesc('difficulty')->get();
+            $totalSubmittedWorkHour = 0;
+            foreach ($tasks as $task) {
+                if ($totalSubmittedWorkHour >= $this->getWorkHourPerWeek()) {
+                    continue 2;
+                }
+                foreach ($users as $user) {
+                    $userWorkHourByWeek = Work::where(['user_id' => $user->id, 'week_number' => $i])->sum('hour');
+                    if ($task and $task->user_id) {
+                        $task = Task::whereNull('user_id')->where('hour', '<=', TodoEnum::WORKER_WEEKLY_HOUR_COUNT - $userWorkHourByWeek)->first();
+                    }
+                    if ($task and $userWorkHourByWeek + $task->hour <= TodoEnum::WORKER_WEEKLY_HOUR_COUNT) {
+                        if (!Work::where('task_id', $task->id)->count()) {
+                            Work::create(['user_id' => $user->id, 'task_id' => $task->id, 'week_number' => $i, 'hour' => $task->hour]);
+                            $task->update(['user_id' => $user->id]);
+                            $totalSubmittedWorkHour += $task->hour;
                         }
-                        break;
                     }
                 }
-
             }
+
         }
     }
 
@@ -62,7 +64,7 @@ class ToDoService
      *
      * @return int
      */
-    public function getWorkHourPerWeek() : int
+    public function getWorkHourPerWeek(): int
     {
         return User::count() * 45;
     }
